@@ -1,0 +1,22 @@
+QSlider {
+    background-color: black;
+    border-radius: 10px;
+}
+
+QSlider:handle {
+    background-color: white;
+    width: 0px; /* Ширина бегунка */
+    height: 12px; /* Высота бегунка */
+    margin: -3px 0;
+    border-radius: 6px;
+}
+
+QSlider::groove {
+    background-color: #b3b3b3;
+    height: 5px;
+}
+
+QSlider::sub-page {
+    background-color: white;
+    height: 5px;
+}

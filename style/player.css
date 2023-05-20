@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Nunito';
+    src: url('sources/Nunito-Bold.ttf');
+}
+
+QFrame {
+    background-color: #000000;
+    font-family: 'Nunito';
+}

@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'Nunito';
+    src: url('sources/Nunito-Bold.ttf');
+}
+
+QMenu {
+    background-color: #171717;
+    color: #CCCCCC;
+    border: 1px solid #000000;
+    padding: 2px;
+    font-size: 14px;
+    font-family: 'Nunito';
+}
+
+QMenu::item:selected {
+    background-color: #373737;
+}
+
+QMenu::separator {
+    background-color: #000000;  /* Set the color of the separator to red (#FF0000) */
+    height: 1px; /* Set the height of the separator */
+    margin-top: 4px; /* Adjust the top margin of the separator */
+    margin-bottom: 4px; /* Adjust the bottom margin of the separator */
+}

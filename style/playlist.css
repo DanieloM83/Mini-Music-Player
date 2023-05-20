@@ -1,0 +1,58 @@
+@font-face {
+    font-family: 'Nunito';
+    src: url('sources/Nunito-Bold.ttf');
+}
+
+QListWidget {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Nunito';
+    border-radius: 5px;
+}
+
+QListWidget::item:selected {
+    background-color: #444444;
+    color: #ffffff;
+}
+
+QScrollBar:horizontal {
+        background: #f1f1f1;
+        height: 15px;
+        margin: 0px;
+    }
+
+    QScrollBar::handle:horizontal {
+        background: #888;
+        min-width: 20px;
+    }
+
+    QScrollBar::add-line:horizontal {
+        border: none;
+        background: none;
+    }
+
+    QScrollBar::sub-line:horizontal {
+        border: none;
+        background: none;
+    }
+
+    QScrollBar:vertical {
+        background: #f1f1f1;
+        width: 15px;
+        margin: 0px;
+    }
+
+    QScrollBar::handle:vertical {
+        background: #888;
+        min-height: 20px;
+    }
+
+    QScrollBar::add-line:vertical {
+        border: none;
+        background: none;
+    }
+
+    QScrollBar::sub-line:vertical {
+        border: none;
+        background: none;
+    }

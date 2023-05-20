@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Nunito';
+    src: url('sources/Nunito-Bold.ttf');
+}
+
+QWidget {
+    background: #121212;
+}
