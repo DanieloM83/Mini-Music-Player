@@ -47,8 +47,7 @@ playlists.**
     > unfolded. By default, it is on top of all other windows, 
     > which makes the player very convenient and compact.**
 
-<img width=49% src="style\resources\us1.jpg">
-<img width=49% src="style\resources\us2.jpg">
+<img width=49% src="style\resources\us1.jpg"> <img width=49% src="style\resources\us2.jpg">
 
 ***
 
