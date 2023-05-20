@@ -23,18 +23,14 @@ playlists.**
 
 <h3 align="center"><strong>Installation</strong></h3>
 
-> *There is currently no version of the application available for installation.*
->
 > **To install the latest version, navigate to 
 > <a src="https://github.com/DanieloM83/Mini-Music-Player/releases/">
 > releases</a> and select the appropriate version. Then download the 
 > archive with the installer, and install Music Player like any other 
 > program.**
 
-<img width=49% src="style\resources\ins1.jpg">
-<img width=49% src="style\resources\ins2.jpg">
-<img width=49% src="style\resources\ins3.jpg">
-<img width=49% src="style\resources\ins4.jpg">
+<img width=49% src="style\resources\ins1.jpg"> <img width=49% src="style\resources\ins2.jpg">
+<img width=49% src="style\resources\ins3.jpg"> <img width=49% src="style\resources\ins4.jpg">
 
 ***
 
@@ -64,7 +60,7 @@ playlists.**
 <strong>
 
 > + Beta:
->    + 1.0.0 - first, rawest release. *[05.20.2023]*
+>    + [1.0.0 - first, rawest release. *[05.20.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.0-beta)
 
 </strong>
 </h4>
