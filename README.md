@@ -24,13 +24,9 @@ playlists.**
 <h3 align="center"><strong>Installation</strong></h3>
 
 > **To install the latest version, navigate to 
-> <a src="https://github.com/DanieloM83/Mini-Music-Player/releases/">
-> releases</a> and select the appropriate version. Then download the 
-> archive with the installer, and install Music Player like any other 
-> program.**
-
-<img width=49% src="style\resources\ins1.jpg"> <img width=49% src="style\resources\ins2.jpg">
-<img width=49% src="style\resources\ins3.jpg"> <img width=49% src="style\resources\ins4.jpg">
+> [releases](https://github.com/DanieloM83/Mini-Music-Player/releases) and select the appropriate version. 
+> Then download the archive with the application, unzip it to any place and run the program's executable file 
+> (you can also create a shortcut).**
 
 ***
 
