@@ -40,8 +40,8 @@ playlists.**
 > with your music**
 > + **Select a playlist and click the "Play" button**
 > + **When you press the "F8" key, the window is minimized and 
-    > unfolded. By default, it is on top of all other windows, 
-    > which makes the player very convenient and compact.**
+> unfolded. By default, it is on top of all other windows, 
+> which makes the player very convenient and compact.**
 
 <img width=49% src="style\resources\us1.jpg"> <img width=49% src="style\resources\us2.jpg">
 
@@ -55,7 +55,8 @@ playlists.**
 <strong>
 
 > + Beta:
->    + [1.0.0 - first, rawest release. *[05.20.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.0-beta)
+>  + [1.0.0 - first, rawest release. *[05.20.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.0-beta)
+>  + [1.0.1 - add some functional. *[05.25.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.1-beta)
 
 </strong>
 </h4>

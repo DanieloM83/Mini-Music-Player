@@ -24,6 +24,8 @@ class MusicPlayer(QThread):
             slider = self.parent.Player_Frame.musicslider
             slider.setValue(self.pos)
             self.pos += 1
+            if self.pos >= slider.maximum():
+                self.next()
         except Exception as ex:
             print(ex)
 
@@ -34,15 +36,7 @@ class MusicPlayer(QThread):
         slider.setMaximum(int(duration))
 
     def run(self):
-        END_OF_TRACK_EVENT = pygame.USEREVENT + 1
-        pygame.mixer.music.set_endevent(END_OF_TRACK_EVENT)
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    running = False
-                elif event.type == END_OF_TRACK_EVENT:
-                    self.next()
+        ...
 
     def get_playlist(self, path):
         try:

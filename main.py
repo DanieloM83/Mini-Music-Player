@@ -1,7 +1,7 @@
 from utils import StyleSheet
 from widgets import PlayerFrame, MainFrame
 from PyQt6.QtWidgets import QMainWindow, QApplication, QSystemTrayIcon, QMenu
-from PyQt6.QtGui import QAction, QIcon, QActionGroup
+from PyQt6.QtGui import QAction, QIcon, QActionGroup, QCursor
 from PyQt6.QtCore import Qt
 from functools import partial
 import sys
@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
     Player_Frame = None
     Main_Frame = None
     Player = None
-    Keyboard = None
+    Listener = None
     isRunning = True
 
     def __init__(self):
@@ -24,8 +24,8 @@ class MainWindow(QMainWindow):
             self.ui_init()
             self.tray_init()
             self.Player.start()
-            listener = keyboard.Listener(on_release=lambda key: Window.shortcut_open(key))
-            listener.start()
+            self.Listener = keyboard.Listener(on_release=lambda key: Window.shortcut_open(key))
+            self.Listener.start()
         except Exception as ex:
             print(ex)
 
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         with StyleSheet("main_window.css") as style:
             self.setStyleSheet(style)
 
+        self.setWindowIcon(QIcon("style/resources/Player.ico"))
         self.setWindowTitle("Music Player")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.__resize_window(20, 18.5)
@@ -79,12 +80,17 @@ class MainWindow(QMainWindow):
         tray.show()
 
     def tray_close(self):
-        self.isRunning = False
-        self.Player.close()
-        self.Keyboard.close()
-        app.quit()
+        try:
+            self.isRunning = False
+            self.Player.quit()
+            self.Listener.stop()
+            self.Tray.hide()
+            self.Tray.deleteLater()
+            app.quit()
+        except Exception as ex:
+            print(ex)
 
-    def __tray_open(self, reason="ActivationReason.Trigger"):
+    def __tray_open(self, reason):
         if str(reason) == "ActivationReason.Trigger":
             if self.isVisible():
                 return self.setVisible(False)
@@ -100,6 +106,37 @@ class MainWindow(QMainWindow):
             if self.isVisible():
                 return self.setVisible(False)
             self.setVisible(True)
+
+    def mousePressEvent(self, event):
+        try:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.dragStartPosition = QCursor.pos()
+        except Exception as ex:
+            print(ex)
+
+    def mouseMoveEvent(self, event):
+        try:
+            if event.buttons() == Qt.MouseButton.LeftButton:
+                delta = event.globalPosition().toPoint() - self.dragStartPosition
+                new_pos = self.pos() + delta
+                right_down = self.pos() + delta + self.geometry().bottomRight()
+
+                desktop = QApplication.primaryScreen()  # Или QGuiApplication.primaryScreen()
+                available_rect = desktop.geometry()
+
+                # Проверка и корректировка позиции окна
+                if not available_rect.contains(new_pos):
+                    new_pos.setX(max(available_rect.left(), min(new_pos.x(), available_rect.right() - self.width())))
+                    new_pos.setY(max(available_rect.top(), min(new_pos.y(), available_rect.bottom() - self.height())))
+
+                if not available_rect.contains(right_down):
+                    new_pos.setX(max(available_rect.left(), min(new_pos.x(), available_rect.right() - self.width())))
+                    new_pos.setY(max(available_rect.top(), min(new_pos.y(), available_rect.bottom() - self.height())))
+
+                self.move(new_pos)
+                self.dragStartPosition = QCursor.pos()
+        except Exception as ex:
+            print(ex)
 
 
 if __name__ == "__main__":
