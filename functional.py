@@ -1,4 +1,5 @@
 from PyQt6.QtCore import QThread, QTimer
+from PyQt6.QtGui import QIcon
 import os
 import pygame
 from pygame.locals import *
@@ -8,6 +9,8 @@ class MusicPlayer(QThread):
     playlist = []
     current = 0
     paused = True
+    isstop = True
+    duration = 0
     pos = 0
 
     def __init__(self, parent):
@@ -24,6 +27,7 @@ class MusicPlayer(QThread):
             slider = self.parent.Player_Frame.musicslider
             slider.setValue(self.pos)
             self.pos += 1
+            self.parent.Player_Frame.set_label(self.format_time(self.pos), self.format_time(self.duration-self.pos))
             if self.pos >= slider.maximum():
                 self.next()
         except Exception as ex:
@@ -33,6 +37,7 @@ class MusicPlayer(QThread):
         slider = self.parent.Player_Frame.musicslider
         sound = pygame.mixer.Sound(self.playlist[self.current])
         duration = sound.get_length()
+        self.duration = duration
         slider.setMaximum(int(duration))
 
     def run(self):
@@ -40,6 +45,7 @@ class MusicPlayer(QThread):
 
     def get_playlist(self, path):
         try:
+            self.isstop = False
             extensions = [".mp3", ".wav", ".wma"]
 
             file_paths = []
@@ -57,14 +63,15 @@ class MusicPlayer(QThread):
             print(e)
 
     def play_stop(self):
-        if self.paused:
-            self.paused = False
-            pygame.mixer.music.unpause()
-            self.timer.start(1000)
-        else:
-            self.paused = True
-            pygame.mixer.music.pause()
-            self.timer.stop()
+        if not self.isstop:
+            if self.paused:
+                self.paused = False
+                pygame.mixer.music.unpause()
+                self.timer.start(1000)
+            else:
+                self.paused = True
+                pygame.mixer.music.pause()
+                self.timer.stop()
 
     def next(self):
         try:
@@ -76,9 +83,9 @@ class MusicPlayer(QThread):
             pygame.mixer.music.play()
             if self.paused:
                 pygame.mixer.music.pause()
-            self.update_slider()
             self.pos = 0
             self.set_slider()
+            self.update_slider()
         except Exception as ex:
             print(ex)
 
@@ -92,12 +99,31 @@ class MusicPlayer(QThread):
             pygame.mixer.music.play()
             if self.paused:
                 pygame.mixer.music.pause()
-            self.update_slider()
             self.pos = 0
             self.set_slider()
+            self.update_slider()
         except Exception as ex:
             print(ex)
 
     def set_pos(self, pos):
         pygame.mixer.music.set_pos(pos)
         self.pos = pos
+
+    def set_volume(self, volume):
+        volume = volume / 100
+        pygame.mixer.music.set_volume(volume)
+
+    def format_time(self, seconds):
+        minutes = int(seconds // 60)
+        seconds = int(seconds % 60)
+        return f"{minutes}:{seconds:02d}"
+
+    def stop(self):
+        pygame.mixer.music.stop()
+        self.playlist = []
+        self.paused = True
+        self.isstop = True
+        self.timer.stop()
+        self.parent.Player_Frame.set_label(self.format_time(0), self.format_time(0))
+        self.parent.Player_Frame.playbutton.setIcon(QIcon("style/resources/play.svg"))
+        self.parent.Player_Frame.musicslider.setValue(0)

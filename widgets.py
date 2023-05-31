@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QFrame, QListWidget, QToolButton, QSlider, QFileDialog
+from PyQt6.QtWidgets import QFrame, QListWidget, QToolButton, QSlider, QFileDialog, QLabel
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import QSize, Qt
 from utils import StyleSheet
@@ -57,6 +57,31 @@ class PlayerFrame(QFrame):
         self.prevbutton = PrevButton(self)
         self.musicslider = MusicSlider(self)
 
+        self.volumebutton = VolumeButton(self)
+        self.volumeslider = VolumeSlider(self)
+
+        self.labels()
+
+    def labels(self):
+        self.start = QLabel("0:00", self)
+        self.end = QLabel("0:00", self)
+
+        self.start.setFont(QFont("style/resources/Nunito-Bold.ttf", 10, QFont.Weight.Bold))
+        self.start.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.start.setStyleSheet("color: white;")
+
+        self.end.setFont(QFont("style/resources/Nunito-Bold.ttf", 10, QFont.Weight.Bold))
+        self.end.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.end.setStyleSheet("color: white;")
+
+        self.start.setGeometry(self.musicslider.geometry().x() - 35, self.musicslider.geometry().y() - 3, 30, 20)
+        self.end.setGeometry(self.musicslider.geometry().x() + self.musicslider.geometry().width() + 5,
+                             self.musicslider.geometry().y() - 3, 30, 20)
+
+    def set_label(self, start_text, end_text):
+        self.start.setText(start_text)
+        self.end.setText(end_text)
+
     def __resize_frame(self, width_percent, height_percent):
         pg = self.parent().geometry()
         w, h = pg.width(), pg.height()
@@ -87,6 +112,10 @@ class PlayListSelector(QListWidget):
         items = data["PlayLists"]
         for name in items:
             self.addItem(name)
+        if len(items) == 1:
+            self.setCurrentRow(0)
+            self.parent().parent().Player.get_playlist(data["PlayLists"][self.currentItem().text()])
+
 
     def handle_item_clicked(self, item):
         with open("config.json", "r", encoding="utf-8") as f:
@@ -125,13 +154,14 @@ class PlayButton(QToolButton):
         self.setGeometry(int(w // 2 - width // 2), 5, int(width), int(height))
 
     def on_release(self):
-        self.parent().parent().Player.play_stop()
-        if self.icon_name == "play":
-            self.icon_name = "pause"
-            self.setIcon(QIcon("style/resources/pause.svg"))
-        else:
-            self.icon_name = "play"
-            self.setIcon(QIcon("style/resources/play.svg"))
+        if not self.parent().parent().Player.isstop:
+            self.parent().parent().Player.play_stop()
+            if self.icon_name == "play":
+                self.icon_name = "pause"
+                self.setIcon(QIcon("style/resources/pause.svg"))
+            else:
+                self.icon_name = "play"
+                self.setIcon(QIcon("style/resources/play.svg"))
 
 
 class NextButton(QToolButton):
@@ -308,8 +338,118 @@ class DelButton(QToolButton):
         combobox = self.parent().combobox
         try:
             del data["PlayLists"][combobox.currentItem().text()]
+            self.parent().parent().Player.stop()
         except:
             pass
         with open("config.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
         combobox.rewrite()
+
+
+class VolumeButton(QToolButton):
+    isMuted = False
+
+    def __init__(self, parent):
+        super(VolumeButton, self).__init__(parent)
+        self.ui_init()
+
+    def ui_init(self):
+        self.setIconSize(QSize(50, 50))
+        self.setAutoRaise(True)
+        icon = QIcon("style/resources/volume4.svg")
+        self.setIcon(icon)
+        self.__resize_button(7)
+        self.released.connect(self.on_release)
+
+    def __resize_button(self, percent):
+        with StyleSheet("button.css") as style:
+            self.setStyleSheet(style)
+
+        pg = self.parent().geometry()
+        h = pg.height()
+        w = pg.width()
+        width = w * percent / 100
+        height = width
+        self.setGeometry(int(3 * w // 4 - width // 2), 5, int(width), int(height))
+
+    def on_release(self):
+        if self.isMuted:
+            # включи звук, сверяясь с бегунком
+            self.isMuted = False
+            volume = self.parent().volumeslider.value()
+            self.set_icon(volume)
+            self.set_volume(volume)
+        else:
+            # выключи звук
+            self.isMuted = True
+            self.set_icon(0)
+            self.set_volume(0)
+
+    def set_icon(self, value):
+        if value == 0:
+            self.setIcon(QIcon("style/resources/volume1.svg"))
+        elif value < 33:
+            self.setIcon(QIcon("style/resources/volume2.svg"))
+        elif value < 66:
+            self.setIcon(QIcon("style/resources/volume3.svg"))
+        else:
+            self.setIcon(QIcon("style/resources/volume4.svg"))
+
+        if value != 0:
+            self.isMuted = False
+
+        self.set_volume(value)
+
+    def set_volume(self, volume):
+        self.parent().parent().Player.set_volume(volume)
+
+
+class VolumeSlider(QSlider):
+    def __init__(self, parent):
+        super(VolumeSlider, self).__init__(parent)
+        self.ui_init()
+        self.mousePressEvent = self.sliderMousePressEvent
+        self.enterEvent = self.sliderEnterEvent
+        self.leaveEvent = self.sliderLeaveEvent
+        self.setMaximum(100)
+        self.setValue(100)
+
+    def ui_init(self):
+        with StyleSheet('slider.css') as style:
+            self.setStyleSheet(style)
+
+        self.setOrientation(Qt.Orientation.Horizontal)
+        self.__resize_slider(19)
+
+    def __resize_slider(self, percent):
+        volume_button = self.parent().volumebutton.geometry()
+        vol_x = volume_button.x() + volume_button.width()
+        vol_y = volume_button.y()
+        vol_h = volume_button.height()
+        ps = self.parent().size()
+        w = int(ps.width() * percent / 100)
+        self.setGeometry(vol_x + 5, vol_y + vol_h // 3, w, 12)
+
+    def sliderMousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            # Получение значения слайдера в пиксельных координатах
+            pixelValue = event.pos().x()
+            # Перевод пиксельных координат в значение слайдера
+            sliderValue = self.minimum() + int(pixelValue / self.width() * (self.maximum() - self.minimum()))
+            # Установка нового значения слайдера
+            self.setValue(sliderValue)
+            self.parent().volumebutton.set_icon(sliderValue)
+
+    def sliderEnterEvent(self, event):
+        with open("config.json", "r", encoding="utf-8") as style:
+            data = json.load(style)
+        now = self.styleSheet()
+        self.setStyleSheet(now + "QSlider::handle:horizontal { width: 12px; }" +
+                           "QSlider::sub-page {background-color:" + data["Theme"] + ";}")
+
+    # Функция, вызываемая при выходе мыши из слайдера
+    def sliderLeaveEvent(self, event):
+        # Установка стиля для скрытия бегунка при выходе
+        now = self.styleSheet()
+        self.setStyleSheet(now + "QSlider::handle:horizontal { width: 0px; }" +
+                           "QSlider::sub-page {background-color:white;}")

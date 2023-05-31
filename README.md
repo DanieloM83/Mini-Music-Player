@@ -55,8 +55,9 @@ playlists.**
 <strong>
 
 > + Beta:
->  + [1.0.0 - first, rawest release. *[05.20.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.0-beta)
->  + [1.0.1 - add some functional. *[05.25.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.1-beta)
+>   + [1.0.0 - first, rawest release. *[05.20.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.0-beta)
+>   + [1.0.1 - add some functional. *[05.25.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.1-beta)
+>   + [1.0.2 - volume slider. *[06.01.2023]*](https://github.com/DanieloM83/Mini-Music-Player/releases/tag/v1.0.2-beta)
 
 </strong>
 </h4>

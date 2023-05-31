@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Nunito';
-    src: url('sources/Nunito-Bold.ttf');
+    src: url('resources/Nunito-Bold.ttf');
 }
 
 QListWidget {
