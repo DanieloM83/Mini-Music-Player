@@ -1,8 +1,8 @@
 from PyQt6.QtCore import QThread, QTimer
+from PyQt6.QtCore import QFile, QTextStream
 from PyQt6.QtGui import QIcon
 import os
 import pygame
-from pygame.locals import *
 
 
 class MusicPlayer(QThread):
@@ -24,17 +24,17 @@ class MusicPlayer(QThread):
 
     def update_slider(self):
         try:
-            slider = self.parent.Player_Frame.musicslider
+            slider = self.parent.PlayerFrame.MusicSlider
             slider.setValue(self.pos)
             self.pos += 1
-            self.parent.Player_Frame.set_label(self.format_time(self.pos), self.format_time(self.duration-self.pos))
+            self.parent.PlayerFrame.Labels.set_text(self.format_time(self.pos), self.format_time(self.duration - self.pos))
             if self.pos >= slider.maximum():
                 self.next()
         except Exception as ex:
             print(ex)
 
     def set_slider(self):
-        slider = self.parent.Player_Frame.musicslider
+        slider = self.parent.PlayerFrame.MusicSlider
         sound = pygame.mixer.Sound(self.playlist[self.current])
         duration = sound.get_length()
         self.duration = duration
@@ -124,6 +124,19 @@ class MusicPlayer(QThread):
         self.paused = True
         self.isstop = True
         self.timer.stop()
-        self.parent.Player_Frame.set_label(self.format_time(0), self.format_time(0))
-        self.parent.Player_Frame.playbutton.setIcon(QIcon("style/resources/play.svg"))
-        self.parent.Player_Frame.musicslider.setValue(0)
+        self.parent.PlayerFrame.Labels.set_text(self.format_time(0), self.format_time(0))
+        self.parent.PlayerFrame.PlayButton.setIcon(QIcon("style/resources/play.svg"))
+        self.parent.PlayerFrame.MusicSlider.setValue(0)
+
+
+class StyleSheet(QFile):
+    def __init__(self, stylesheet):
+        path = "style/" + stylesheet
+        super().__init__(path)
+
+    def __enter__(self):
+        self.open(QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text)
+        return QTextStream(self).readAll()
+
+    def __exit__(self, *args):
+        self.close()

@@ -1,25 +1,27 @@
-from utils import StyleSheet
-from widgets import PlayerFrame, MainFrame
+from functional import StyleSheet
+from widgets import base, frames
 from PyQt6.QtWidgets import QMainWindow, QApplication, QSystemTrayIcon, QMenu
-from PyQt6.QtGui import QAction, QIcon, QActionGroup, QCursor
+from PyQt6.QtGui import QAction, QIcon, QActionGroup
 from PyQt6.QtCore import Qt
 from functools import partial
 import sys
+import json
 from pynput import keyboard
 from functional import MusicPlayer
 
 
-class MainWindow(QMainWindow):
-    Tray = None
-    Player_Frame = None
-    Main_Frame = None
-    Player = None
+class MainWindow(QMainWindow, base.BaseWidget):
+    PlayerFrame = None
+    MainFrame = None
     Listener = None
-    isRunning = True
+    Player = None
+    Tray = None
+    isRunning = False
 
     def __init__(self):
         super().__init__()
         try:
+            self.isRunning = True
             self.Player = MusicPlayer(self)
             self.ui_init()
             self.tray_init()
@@ -36,17 +38,12 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon("style/resources/Player.ico"))
         self.setWindowTitle("Music Player")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
-        self.__resize_window(20, 18.5)
-        self.Player_Frame = PlayerFrame(self)
-        self.Main_Frame = MainFrame(self)
-        self.show()
+        self.resize_widget(0.7994, 0.8148, 0.2006, 0.186, parent=app.primaryScreen())
 
-    def __resize_window(self, width_percent, height_percent):
-        desktop = app.primaryScreen().size()
-        w, h = desktop.width(), desktop.height()
-        width = w * width_percent / 100
-        height = h * height_percent / 100
-        self.setGeometry(int(w - width) - 1, int(h - height), int(width) + 1, int(height) + 1)
+        self.PlayerFrame = frames.PlayerFrame(self)
+        self.MainFrame = frames.MainFrame(self)
+
+        self.show()
 
     def tray_init(self):
         with StyleSheet('tray.css') as style:
@@ -65,7 +62,7 @@ class MainWindow(QMainWindow):
 
         for name, color in [["Red", "#FF0000"], ["Blue", "#0000FF"], ["Yellow", "#FFFF00"], ["Green", "#00FF00"]]:
             action = QAction(name, submenu)
-            action.triggered.connect(partial(self.Main_Frame.add_gradient, color))
+            action.triggered.connect(partial(self.change_theme, color))
             action.setCheckable(True)
             action_group.addAction(action)
             submenu.addAction(action)
@@ -107,36 +104,13 @@ class MainWindow(QMainWindow):
                 return self.setVisible(False)
             self.setVisible(True)
 
-    def mousePressEvent(self, event):
-        try:
-            if event.button() == Qt.MouseButton.LeftButton:
-                self.dragStartPosition = QCursor.pos()
-        except Exception as ex:
-            print(ex)
-
-    def mouseMoveEvent(self, event):
-        try:
-            if event.buttons() == Qt.MouseButton.LeftButton:
-                delta = event.globalPosition().toPoint() - self.dragStartPosition
-                new_pos = self.pos() + delta
-                right_down = self.pos() + delta + self.geometry().bottomRight()
-
-                desktop = QApplication.primaryScreen()  # Или QGuiApplication.primaryScreen()
-                available_rect = desktop.geometry()
-
-                # Проверка и корректировка позиции окна
-                if not available_rect.contains(new_pos):
-                    new_pos.setX(max(available_rect.left(), min(new_pos.x(), available_rect.right() - self.width())))
-                    new_pos.setY(max(available_rect.top(), min(new_pos.y(), available_rect.bottom() - self.height())))
-
-                if not available_rect.contains(right_down):
-                    new_pos.setX(max(available_rect.left(), min(new_pos.x(), available_rect.right() - self.width())))
-                    new_pos.setY(max(available_rect.top(), min(new_pos.y(), available_rect.bottom() - self.height())))
-
-                self.move(new_pos)
-                self.dragStartPosition = QCursor.pos()
-        except Exception as ex:
-            print(ex)
+    def change_theme(self, color):
+        with open("config.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.MainFrame.change_theme(color)
+        data["Theme"] = color
+        with open("config.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
